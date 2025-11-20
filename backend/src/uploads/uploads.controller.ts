@@ -20,6 +20,20 @@ import { UploadsService } from './uploads.service';
 @Controller('uploads')
 @UseGuards(JwtAuthGuard)
 export class UploadsController {
+  private static readonly allowedMimeTypes = [
+    'image/jpeg',
+    'image/png',
+    'image/gif',
+    'image/webp',
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'text/plain',
+    'application/rtf',
+    'image/dicom',
+    'application/dicom',
+  ];
+
   constructor(private readonly uploadsService: UploadsService) {}
 
   @Post('single')
@@ -37,7 +51,10 @@ export class UploadsController {
         },
       }),
       fileFilter: (req, file, callback) => {
-        if (file && !this.uploadsService.validateFileType(file.mimetype)) {
+        if (
+          file &&
+          !UploadsController.allowedMimeTypes.includes(file.mimetype)
+        ) {
           return callback(new BadRequestException('Invalid file type'), false);
         }
         callback(null, true);
@@ -82,7 +99,10 @@ export class UploadsController {
         },
       }),
       fileFilter: (req, file, callback) => {
-        if (file && !this.uploadsService.validateFileType(file.mimetype)) {
+        if (
+          file &&
+          !UploadsController.allowedMimeTypes.includes(file.mimetype)
+        ) {
           return callback(new BadRequestException('Invalid file type'), false);
         }
         callback(null, true);
@@ -133,7 +153,10 @@ export class UploadsController {
         },
       }),
       fileFilter: (req, file, callback) => {
-        if (file && !this.uploadsService.validateFileType(file.mimetype)) {
+        if (
+          file &&
+          !UploadsController.allowedMimeTypes.includes(file.mimetype)
+        ) {
           return callback(new BadRequestException('Invalid file type'), false);
         }
         callback(null, true);
