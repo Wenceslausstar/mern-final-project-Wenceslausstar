@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { Types } from 'mongoose';
 import {
   Appointment,
   AppointmentDocument,
@@ -23,6 +24,15 @@ export class AppointmentsService {
   async create(
     createAppointmentDto: Partial<Appointment>,
   ): Promise<AppointmentDocument> {
+    if (
+      !createAppointmentDto.appointmentDate ||
+      !createAppointmentDto.doctorId
+    ) {
+      throw new BadRequestException(
+        'Appointment date and doctor ID are required',
+      );
+    }
+
     // Check for scheduling conflicts
     const conflict = await this.checkSchedulingConflict(
       createAppointmentDto.doctorId,
@@ -229,19 +239,15 @@ export class AppointmentsService {
     const query: any = {
       doctorId,
       status: { $in: [AppointmentStatus.PENDING, AppointmentStatus.APPROVED] },
-      $or: [
-        {
-          appointmentDate: { $lt: appointmentEnd },
-          $expr: {
-            $gt: [
-              {
-                $add: ['$appointmentDate', { $multiply: ['$duration', 60000] }],
-              },
-              appointmentDate,
-            ],
+      appointmentDate: { $lt: appointmentEnd },
+      $expr: {
+        $gt: [
+          {
+            $add: ['$appointmentDate', { $multiply: ['$duration', 60000] }],
           },
-        },
-      ],
+          appointmentDate,
+        ],
+      },
     };
 
     if (excludeAppointmentId) {
@@ -285,7 +291,7 @@ export class AppointmentsService {
     const matchStage: any = {};
 
     if (doctorId) {
-      matchStage.doctorId = this.appointmentModel.db.Types.ObjectId(doctorId);
+      matchStage.doctorId = new Types.ObjectId(doctorId);
     }
 
     return this.appointmentModel.aggregate([

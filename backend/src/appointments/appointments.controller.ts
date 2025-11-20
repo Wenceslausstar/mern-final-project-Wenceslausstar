@@ -12,6 +12,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import { Types } from 'mongoose';
 import { AppointmentsService } from './appointments.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
@@ -19,7 +20,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../users/schemas/user.schema';
-import { AppointmentStatus } from './schemas/appointment.schema';
+import { Appointment, AppointmentStatus } from './schemas/appointment.schema';
 
 @Controller('appointments')
 @UseGuards(JwtAuthGuard)
@@ -33,7 +34,8 @@ export class AppointmentsController {
   ) {
     return this.appointmentsService.create({
       ...createAppointmentDto,
-      patientId: req.user.id,
+      doctorId: new Types.ObjectId(createAppointmentDto.doctorId),
+      patientId: new Types.ObjectId(req.user.id),
       appointmentDate: new Date(createAppointmentDto.appointmentDate),
     });
   }
@@ -126,8 +128,11 @@ export class AppointmentsController {
       throw new Error('Access denied');
     }
 
-    // Convert date string to Date object if provided
-    const updateData = { ...updateAppointmentDto };
+    // Prepare update data with proper types
+    const updateData: any = { ...updateAppointmentDto };
+    if (updateAppointmentDto.doctorId) {
+      updateData.doctorId = new Types.ObjectId(updateAppointmentDto.doctorId);
+    }
     if (updateAppointmentDto.appointmentDate) {
       updateData.appointmentDate = new Date(
         updateAppointmentDto.appointmentDate,

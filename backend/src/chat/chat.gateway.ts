@@ -10,7 +10,9 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
+import { Types } from 'mongoose';
 import { ChatService } from './chat.service';
+import { MessageType } from './schemas/message.schema';
 
 interface AuthenticatedSocket extends Socket {
   userId?: string;
@@ -115,18 +117,20 @@ export class ChatGateway
 
       // Create message in database
       const message = await this.chatService.createMessage({
-        senderId: client.userId,
-        receiverId: data.receiverId,
+        senderId: new Types.ObjectId(client.userId),
+        receiverId: new Types.ObjectId(data.receiverId),
         content: data.content,
-        type: data.type || 'text',
-        appointmentId: data.appointmentId,
+        type: (data.type as MessageType) || MessageType.TEXT,
+        appointmentId: data.appointmentId
+          ? new Types.ObjectId(data.appointmentId)
+          : undefined,
         fileUrl: data.fileUrl,
         fileName: data.fileName,
       });
 
       // Populate message with user details
       const populatedMessage = await this.chatService.getMessageById(
-        message._id,
+        message._id.toString(),
       );
 
       // Send to receiver if online
@@ -191,18 +195,20 @@ export class ChatGateway
 
       // Create message in database
       const message = await this.chatService.createMessage({
-        senderId: client.userId,
-        receiverId: data.receiverId,
+        senderId: new Types.ObjectId(client.userId),
+        receiverId: new Types.ObjectId(data.receiverId),
         content: data.content,
-        type: data.type || 'text',
-        appointmentId: data.appointmentId,
+        type: (data.type as MessageType) || MessageType.TEXT,
+        appointmentId: data.appointmentId
+          ? new Types.ObjectId(data.appointmentId)
+          : undefined,
         fileUrl: data.fileUrl,
         fileName: data.fileName,
       });
 
       // Populate message
       const populatedMessage = await this.chatService.getMessageById(
-        message._id,
+        message._id.toString(),
       );
 
       // Send to appointment room

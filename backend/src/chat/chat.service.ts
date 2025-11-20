@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import {
   Message,
   MessageDocument,
@@ -80,8 +80,8 @@ export class ChatService {
       {
         $match: {
           $or: [
-            { senderId: this.messageModel.db.Types.ObjectId(userId) },
-            { receiverId: this.messageModel.db.Types.ObjectId(userId) },
+            { senderId: new Types.ObjectId(userId) },
+            { receiverId: new Types.ObjectId(userId) },
           ],
         },
       },
@@ -93,7 +93,7 @@ export class ChatService {
           _id: {
             $cond: {
               if: {
-                $eq: ['$senderId', this.messageModel.db.Types.ObjectId(userId)],
+                $eq: ['$senderId', new Types.ObjectId(userId)],
               },
               then: '$receiverId',
               else: '$senderId',
@@ -108,7 +108,7 @@ export class ChatService {
                     {
                       $eq: [
                         '$receiverId',
-                        this.messageModel.db.Types.ObjectId(userId),
+                        new Types.ObjectId(userId),
                       ],
                     },
                     { $eq: ['$isRead', false] },

@@ -255,7 +255,7 @@ export class EmrService {
       activePrescriptions: prescriptions.filter(
         (p) => p.status === PrescriptionStatus.ACTIVE,
       ).length,
-      lastVisit: records.length > 0 ? records[0].createdAt : null,
+      lastVisit: records.length > 0 ? (records[0] as any).createdAt : null,
     };
 
     return summary;

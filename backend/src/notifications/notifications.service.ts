@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
-import * as twilio from 'twilio';
+import twilio from 'twilio';
 
 interface EmailOptions {
   to: string;
@@ -19,7 +19,7 @@ interface SMSOptions {
 export class NotificationsService {
   private readonly logger = new Logger(NotificationsService.name);
   private emailTransporter: nodemailer.Transporter;
-  private twilioClient: twilio.Twilio;
+  private twilioClient: any;
 
   constructor(private configService: ConfigService) {
     // Initialize email transporter
