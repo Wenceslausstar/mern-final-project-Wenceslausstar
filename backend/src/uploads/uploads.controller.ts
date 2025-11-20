@@ -28,12 +28,16 @@ export class UploadsController {
       storage: diskStorage({
         destination: './uploads/temp',
         filename: (req, file, callback) => {
-          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-          callback(null, file.fieldname + '-' + uniqueSuffix + extname(file.originalname));
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          callback(
+            null,
+            file.fieldname + '-' + uniqueSuffix + extname(file.originalname),
+          );
         },
       }),
       fileFilter: (req, file, callback) => {
-        if (!this.uploadsService.validateFileType(file.mimetype)) {
+        if (file && !this.uploadsService.validateFileType(file.mimetype)) {
           return callback(new BadRequestException('Invalid file type'), false);
         }
         callback(null, true);
@@ -69,12 +73,16 @@ export class UploadsController {
       storage: diskStorage({
         destination: './uploads/temp',
         filename: (req, file, callback) => {
-          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-          callback(null, file.fieldname + '-' + uniqueSuffix + extname(file.originalname));
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          callback(
+            null,
+            file.fieldname + '-' + uniqueSuffix + extname(file.originalname),
+          );
         },
       }),
       fileFilter: (req, file, callback) => {
-        if (!this.uploadsService.validateFileType(file.mimetype)) {
+        if (file && !this.uploadsService.validateFileType(file.mimetype)) {
           return callback(new BadRequestException('Invalid file type'), false);
         }
         callback(null, true);
@@ -100,7 +108,10 @@ export class UploadsController {
       }
     }
 
-    const uploadedFiles = await this.uploadsService.saveMultipleFiles(files, req.user.id);
+    const uploadedFiles = await this.uploadsService.saveMultipleFiles(
+      files,
+      req.user.id,
+    );
     return {
       message: `${files.length} files uploaded successfully`,
       files: uploadedFiles,
@@ -113,12 +124,16 @@ export class UploadsController {
       storage: diskStorage({
         destination: './uploads/temp',
         filename: (req, file, callback) => {
-          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-          callback(null, file.fieldname + '-' + uniqueSuffix + extname(file.originalname));
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          callback(
+            null,
+            file.fieldname + '-' + uniqueSuffix + extname(file.originalname),
+          );
         },
       }),
       fileFilter: (req, file, callback) => {
-        if (!this.uploadsService.validateFileType(file.mimetype)) {
+        if (file && !this.uploadsService.validateFileType(file.mimetype)) {
           return callback(new BadRequestException('Invalid file type'), false);
         }
         callback(null, true);
@@ -144,7 +159,11 @@ export class UploadsController {
       }
     }
 
-    const uploadedFiles = await this.uploadsService.saveMultipleFiles(files, req.user.id, 'medical');
+    const uploadedFiles = await this.uploadsService.saveMultipleFiles(
+      files,
+      req.user.id,
+      'medical',
+    );
     return {
       message: `${files.length} medical files uploaded successfully`,
       files: uploadedFiles,

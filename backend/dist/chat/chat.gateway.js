@@ -16,7 +16,9 @@ exports.ChatGateway = void 0;
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
 const common_1 = require("@nestjs/common");
+const mongoose_1 = require("mongoose");
 const chat_service_1 = require("./chat.service");
+const message_schema_1 = require("./schemas/message.schema");
 let ChatGateway = class ChatGateway {
     chatService;
     server;
@@ -62,15 +64,17 @@ let ChatGateway = class ChatGateway {
                 return { error: 'Unauthorized' };
             }
             const message = await this.chatService.createMessage({
-                senderId: client.userId,
-                receiverId: data.receiverId,
+                senderId: new mongoose_1.Types.ObjectId(client.userId),
+                receiverId: new mongoose_1.Types.ObjectId(data.receiverId),
                 content: data.content,
-                type: data.type || 'text',
-                appointmentId: data.appointmentId,
+                type: data.type || message_schema_1.MessageType.TEXT,
+                appointmentId: data.appointmentId
+                    ? new mongoose_1.Types.ObjectId(data.appointmentId)
+                    : undefined,
                 fileUrl: data.fileUrl,
                 fileName: data.fileName,
             });
-            const populatedMessage = await this.chatService.getMessageById(message._id);
+            const populatedMessage = await this.chatService.getMessageById(message._id.toString());
             const receiverSocketId = this.connectedUsers.get(data.receiverId);
             if (receiverSocketId) {
                 this.server
@@ -108,15 +112,17 @@ let ChatGateway = class ChatGateway {
                 return { error: 'Unauthorized or missing appointment ID' };
             }
             const message = await this.chatService.createMessage({
-                senderId: client.userId,
-                receiverId: data.receiverId,
+                senderId: new mongoose_1.Types.ObjectId(client.userId),
+                receiverId: new mongoose_1.Types.ObjectId(data.receiverId),
                 content: data.content,
-                type: data.type || 'text',
-                appointmentId: data.appointmentId,
+                type: data.type || message_schema_1.MessageType.TEXT,
+                appointmentId: data.appointmentId
+                    ? new mongoose_1.Types.ObjectId(data.appointmentId)
+                    : undefined,
                 fileUrl: data.fileUrl,
                 fileName: data.fileName,
             });
-            const populatedMessage = await this.chatService.getMessageById(message._id);
+            const populatedMessage = await this.chatService.getMessageById(message._id.toString());
             this.server
                 .to(`appointment_${data.appointmentId}`)
                 .emit('appointment_message', populatedMessage);

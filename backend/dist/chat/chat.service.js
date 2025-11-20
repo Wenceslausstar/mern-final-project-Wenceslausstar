@@ -70,8 +70,8 @@ let ChatService = class ChatService {
             {
                 $match: {
                     $or: [
-                        { senderId: this.messageModel.db.Types.ObjectId(userId) },
-                        { receiverId: this.messageModel.db.Types.ObjectId(userId) },
+                        { senderId: new mongoose_2.Types.ObjectId(userId) },
+                        { receiverId: new mongoose_2.Types.ObjectId(userId) },
                     ],
                 },
             },
@@ -83,7 +83,7 @@ let ChatService = class ChatService {
                     _id: {
                         $cond: {
                             if: {
-                                $eq: ['$senderId', this.messageModel.db.Types.ObjectId(userId)],
+                                $eq: ['$senderId', new mongoose_2.Types.ObjectId(userId)],
                             },
                             then: '$receiverId',
                             else: '$senderId',
@@ -98,7 +98,7 @@ let ChatService = class ChatService {
                                         {
                                             $eq: [
                                                 '$receiverId',
-                                                this.messageModel.db.Types.ObjectId(userId),
+                                                new mongoose_2.Types.ObjectId(userId),
                                             ],
                                         },
                                         { $eq: ['$isRead', false] },

@@ -41,13 +41,16 @@ var __importStar = (this && this.__importStar) || (function () {
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 var NotificationsService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NotificationsService = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const nodemailer = __importStar(require("nodemailer"));
-const twilio = __importStar(require("twilio"));
+const twilio_1 = __importDefault(require("twilio"));
 let NotificationsService = NotificationsService_1 = class NotificationsService {
     configService;
     logger = new common_1.Logger(NotificationsService_1.name);
@@ -67,7 +70,7 @@ let NotificationsService = NotificationsService_1 = class NotificationsService {
         const accountSid = this.configService.get('TWILIO_ACCOUNT_SID');
         const authToken = this.configService.get('TWILIO_AUTH_TOKEN');
         if (accountSid && authToken) {
-            this.twilioClient = twilio(accountSid, authToken);
+            this.twilioClient = (0, twilio_1.default)(accountSid, authToken);
         }
     }
     async sendEmail(options) {
